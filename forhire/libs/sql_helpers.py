@@ -17,8 +17,8 @@ def create_tables(cursor):
 
     keywords_query = """CREATE TABLE IF NOT EXISTS keywords (word TEXT UNIQUE)"""
     blacklist_query = """CREATE TABLE IF NOT EXISTS blacklist (word TEXT UNIQUE)"""
-    posts_query = """CREATE TABLE IF NOT EXISTS posts (post_id TEXT UNIQUE,
-        author TEXT, title TEXT, link TEXT, selftext TEXT, pub_date TEXT) """
+    posts_query = """CREATE TABLE IF NOT EXISTS posts (post_id TEXT UNIQUE, subreddit TEXT,
+    flair TEXT, author TEXT, title TEXT, link TEXT, selftext TEXT, pub_date TEXT) """
 
     cursor.execute(keywords_query)
     cursor.execute(blacklist_query)
@@ -53,9 +53,10 @@ def insert_post_to_table(conn, data_dict):
     """Inserts a post to the posts table."""
 
     with conn:
-        query = "INSERT INTO posts VALUES (?, ?, ?, ?, ?, ?)"
-        conn.execute(query, (data_dict["post_id"], data_dict["author"], data_dict["title"],
-                             data_dict["link"], data_dict["text"], data_dict["pub_date"]))
+        query = "INSERT INTO posts VALUES (?, ?, ?, ?, ?, ?, ?, ?)"
+        conn.execute(query, (data_dict["post_id"], data_dict["subreddit"], data_dict["flair"],
+                             data_dict["author"], data_dict["title"], data_dict["link"],
+                             data_dict["text"], data_dict["pub_date"]))
 
 
 def delete_post_from_table(conn, value):
@@ -66,9 +67,9 @@ def delete_post_from_table(conn, value):
         conn.execute(query, (value,))
 
 
-def load_posts(conn):
+def load_posts(conn, value):
     """Returns all the posts from the posts table."""
 
     with conn:
-        query = "SELECT * FROM posts"
+        query = "SELECT * FROM posts WHERE subreddit='{}'".format(value)
         return conn.execute(query)

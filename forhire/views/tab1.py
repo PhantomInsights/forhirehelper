@@ -17,6 +17,7 @@ from wx.adv import NotificationMessage
 
 import main
 from libs import sql_helpers
+from libs.sibreddits import SUBREDDITS_LIST
 
 
 class Tab1(wx.Panel):
@@ -26,7 +27,7 @@ class Tab1(wx.Panel):
 
         self.selected_post = ""
         self.posts_list = list()
-        self.keywords = list()
+        self.m_keywords = list()
         self.blacklist = list()
 
         self.main_sizer = wx.BoxSizer(wx.VERTICAL)
@@ -44,17 +45,25 @@ class Tab1(wx.Panel):
         self.top_sizer_flags = wx.SizerFlags(
             1).Center().Expand().Border(wx.ALL, 5)
 
+        self.subreddit_label = wx.StaticText(self, label="Select a Subreddit:")
+        self.top_sizer.Add(self.subreddit_label, wx.SizerFlags().Centre())
+
+        self.subreddit_type = wx.ComboBox(
+            self, style=wx.CB_READONLY, choices=[item["name"] for item in SUBREDDITS_LIST])
+        self.Bind(wx.EVT_COMBOBOX, self.select_subreddit, self.subreddit_type)
+        self.top_sizer.Add(self.subreddit_type, self.top_sizer_flags)
+
         self.post_type_label = wx.StaticText(self, label="Select a Post type:")
         self.top_sizer.Add(self.post_type_label, wx.SizerFlags().Centre())
 
-        self.post_type = wx.ComboBox(
-            self, style=wx.CB_READONLY, value="Hiring", choices=["Hiring", "For Hire"])
+        self.post_type = wx.ComboBox(self, style=wx.CB_READONLY)
         self.Bind(wx.EVT_COMBOBOX, self.filter_results, self.post_type)
         self.top_sizer.Add(self.post_type, self.top_sizer_flags)
 
-        self.keywords_checkbox = wx.CheckBox(self, label="Apply Keywords")
-        self.Bind(wx.EVT_CHECKBOX, self.filter_results, self.keywords_checkbox)
-        self.top_sizer.Add(self.keywords_checkbox, self.top_sizer_flags)
+        self.m_keywords_checkbox = wx.CheckBox(self, label="Apply Keywords")
+        self.Bind(wx.EVT_CHECKBOX, self.filter_results,
+                  self.m_keywords_checkbox)
+        self.top_sizer.Add(self.m_keywords_checkbox, self.top_sizer_flags)
 
         self.blacklist_checkbox = wx.CheckBox(
             self, label="Apply Blacklist")
@@ -100,15 +109,31 @@ class Tab1(wx.Panel):
         self.SetSizer(self.main_sizer)
         self.Bind(wx.EVT_SHOW, self.show_handler)
 
+        # We initialize the tab with the first subreeddit.
+        self.subreddit_type.SetValue(SUBREDDITS_LIST[0]["name"])
+        self.select_subreddit(None)
+
     def show_handler(self, event):
         """Called when the Panel is being shown."""
 
         if event.IsShown():
-            self.keywords = [item[0].lower() for item in sql_helpers.load_words(
+            self.m_keywords = [item[0].lower() for item in sql_helpers.load_words(
                 main.sql_conn, "keywords")]
 
             self.blacklist = [item[0].lower() for item in sql_helpers.load_words(
                 main.sql_conn, "blacklist")]
+
+    def select_subreddit(self, event):
+        """Populates the post type ComboBox with the data from the selected subreddit."""
+
+        for subreddit in SUBREDDITS_LIST:
+            if subreddit["name"] == self.subreddit_type.Value:
+                rules = subreddit["rules"]
+                break
+
+        self.post_type.Clear()
+        self.post_type.AppendItems(rules)
+        self.post_type.SetValue(rules[0])
 
     def do_search(self, event):
         """Starts the search."""
@@ -140,19 +165,22 @@ class Tab1(wx.Panel):
                 if self.quick_filter(self.blacklist, item):
                     temp_posts.remove(item)
 
-        if self.keywords_checkbox.IsChecked():
+        if self.m_keywords_checkbox.IsChecked():
             for item in temp_posts:
-                if self.quick_filter(self.keywords, item):
+                if self.quick_filter(self.m_keywords, item):
                     filtered_posts.append(item)
 
-        if len(filtered_posts) == 0:
-            for item in temp_posts:
-                if self.post_type.GetValue().lower() in item["title"].lower():
+        if len(filtered_posts) == 0 and self.m_keywords_checkbox.IsChecked():
+            # No results, we do nothing.
+            pass
+        elif len(filtered_posts) >= 1:
+            for item in filtered_posts:
+                if self.post_type.GetValue().lower() in item["flair"].lower():
                     self.posts_table.Append(
                         [item["post_id"], item["pub_date"], item["author"], item["title"]])
         else:
-            for item in filtered_posts:
-                if self.post_type.GetValue().lower() in item["title"].lower():
+            for item in temp_posts:
+                if self.post_type.GetValue().lower() in item["flair"].lower():
                     self.posts_table.Append(
                         [item["post_id"], item["pub_date"], item["author"], item["title"]])
 
@@ -173,13 +201,19 @@ class Tab1(wx.Panel):
         this cnn be changed in the target default value, the max is 1000.
         """
 
-        headers = {"User-Agent": "r/ForHire Helper v0.1"}
+        for subreddit in SUBREDDITS_LIST:
+            if subreddit["name"] == self.subreddit_type.Value:
+                selected_subreddit = subreddit["id"]
+                break
+
+        headers = {"User-Agent": "r/ForHire Helper v0.2"}
 
         if after == "":
-            url = "https://www.reddit.com/r/forhire/new/.json?limit=100"
+            url = "https://www.reddit.com/r/{}/new/.json?limit=100".format(
+                selected_subreddit)
         else:
-            url = "https://www.reddit.com/r/forhire/new/.json?limit=100&after={}".format(
-                after)
+            url = "https://www.reddit.com/r/{}/new/.json?limit=100&after={}".format(
+                selected_subreddit, after)
 
         with requests.get(url, headers=headers) as response:
 
@@ -187,12 +221,29 @@ class Tab1(wx.Panel):
                 counter += 100
 
                 for submission in response.json()["data"]["children"]:
+
+                    # Very rarely a post has no text.
+                    # We set it to an empty string instead of a null value.
+                    if submission["data"]["selftext_html"] is None:
+                        submission_text = ""
+                    else:
+                        submission_text = submission["data"]["selftext_html"]
+
+                    # We detect if a post has not been flaired.
+                    # If not, we fallback to using its title.
+                    if submission["data"]["link_flair_text"] is None:
+                        flair = submission["data"]["title"]
+                    else:
+                        flair = submission["data"]["link_flair_text"]
+
                     post_dict = {
                         "post_id": submission["data"]["id"],
+                        "flair": flair,
+                        "subreddit": submission["data"]["subreddit"].lower(),
                         "author": submission["data"]["author"],
                         "title": submission["data"]["title"],
                         "link": submission["data"]["url"],
-                        "text": submission["data"]["selftext_html"],
+                        "text": submission_text,
 
                         "pub_date": datetime.fromtimestamp(
                             submission["data"]["created"]).strftime("%Y-%m-%d @ %H:%M:%S")}

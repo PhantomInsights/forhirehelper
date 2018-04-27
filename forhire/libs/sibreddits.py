@@ -1,0 +1,12 @@
+"""
+This list contains the subreddits used in this program.
+The rules key is used to filter the posts between those who seek jobs and those who offer them.
+"""
+
+SUBREDDITS_LIST = [
+    {"id": "forhire", "name": "r/ForHire", "rules": ["For Hire", "Hiring"]},
+    {"id": "designjobs", "name": "r/DesignJobs", "rules": ["For Hire", "Hiring"]},
+    {"id": "hireawriter", "name": "r/HireaWriter", "rules": ["Hire Me", "Hiring"]},
+    {"id": "jobbit", "name": "r/jobbit", "rules": ["For Hire", "Hiring"]},
+    {"id": "slavelabour", "name": "r/SlaveLabour", "rules": ["Task", "Offer"]}
+]

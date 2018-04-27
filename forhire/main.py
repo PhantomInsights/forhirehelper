@@ -11,7 +11,7 @@ class Root(wx.Frame):
     def __init__(self, parent):
 
         wx.Frame.__init__(
-            self, parent, title="r/ForHire Helper v0.1", size=(1000, 800))
+            self, parent, title="r/ForHire Helper v0.2", size=(1000, 800))
 
         self.notebook = wx.Notebook(self)
 

@@ -16,6 +16,7 @@ from wx.adv import NotificationMessage
 
 import main
 from libs import sql_helpers
+from libs.sibreddits import SUBREDDITS_LIST
 
 
 class Tab3(wx.Panel):
@@ -43,11 +44,18 @@ class Tab3(wx.Panel):
         self.top_sizer_flags = wx.SizerFlags(
             1).Center().Expand().Border(wx.ALL, 5)
 
+        self.subreddit_label = wx.StaticText(self, label="Select a Subreddit:")
+        self.top_sizer.Add(self.subreddit_label, wx.SizerFlags().Centre())
+
+        self.subreddit_type = wx.ComboBox(
+            self, style=wx.CB_READONLY, choices=[item["name"] for item in SUBREDDITS_LIST])
+        self.Bind(wx.EVT_COMBOBOX, self.select_subreddit, self.subreddit_type)
+        self.top_sizer.Add(self.subreddit_type, self.top_sizer_flags)
+
         self.post_type_label = wx.StaticText(self, label="Select a Post type:")
         self.top_sizer.Add(self.post_type_label, wx.SizerFlags().Centre())
 
-        self.post_type = wx.ComboBox(
-            self, style=wx.CB_READONLY, value="Hiring", choices=["Hiring", "For Hire"])
+        self.post_type = wx.ComboBox(self, style=wx.CB_READONLY)
         self.Bind(wx.EVT_COMBOBOX, self.filter_results, self.post_type)
         self.top_sizer.Add(self.post_type, self.top_sizer_flags)
 
@@ -95,6 +103,10 @@ class Tab3(wx.Panel):
         self.SetSizer(self.main_sizer)
         self.Bind(wx.EVT_SHOW, self.show_handler)
 
+        # We initialize the tab with the first subreeddit.
+        self.subreddit_type.SetValue(SUBREDDITS_LIST[0]["name"])
+        self.select_subreddit(None)
+
     def show_handler(self, event):
         """Called when the Panel is being shown."""
 
@@ -106,6 +118,19 @@ class Tab3(wx.Panel):
                 main.sql_conn, "blacklist")]
 
             self.load_posts()
+
+    def select_subreddit(self, event):
+        """Populates the post type ComboBox with the data from the selected subreddit."""
+
+        for subreddit in SUBREDDITS_LIST:
+            if subreddit["name"] == self.subreddit_type.Value:
+                rules = subreddit["rules"]
+                break
+
+        self.post_type.Clear()
+        self.post_type.AppendItems(rules)
+        self.post_type.SetValue(rules[0])
+        self.load_posts()
 
     def filter_results(self, event):
         """
@@ -135,14 +160,17 @@ class Tab3(wx.Panel):
                 if self.quick_filter(self.keywords, item):
                     filtered_posts.append(item)
 
-        if len(filtered_posts) == 0:
-            for item in temp_posts:
-                if self.post_type.GetValue().lower() in item["title"].lower():
+        if len(filtered_posts) == 0 and self.keywords_checkbox.IsChecked():
+            # No results, we do nothing.
+            pass
+        elif len(filtered_posts) >= 1:
+            for item in filtered_posts:
+                if self.post_type.GetValue().lower() in item["flair"].lower():
                     self.posts_table.Append(
                         [item["post_id"], item["pub_date"], item["author"], item["title"]])
         else:
-            for item in filtered_posts:
-                if self.post_type.GetValue().lower() in item["title"].lower():
+            for item in temp_posts:
+                if self.post_type.GetValue().lower() in item["flair"].lower():
                     self.posts_table.Append(
                         [item["post_id"], item["pub_date"], item["author"], item["title"]])
 
@@ -159,12 +187,17 @@ class Tab3(wx.Panel):
     def load_posts(self):
         """Loads posts from the posts table."""
 
+        for subreddit in SUBREDDITS_LIST:
+            if subreddit["name"] == self.subreddit_type.Value:
+                selected_subreddit = subreddit["id"]
+                break
+
         self.posts_list = list()
 
-        for item in sql_helpers.load_posts(main.sql_conn):
+        for item in sql_helpers.load_posts(main.sql_conn, selected_subreddit):
             self.posts_list.append(
-                {"post_id": item[0], "author": item[1], "title": item[2],
-                 "link": item[3], "text": item[4], "pub_date": item[5]})
+                {"post_id": item[0], "subreddit": item[1], "flair": item[2], "author": item[3], "title": item[4],
+                 "link": item[5], "text": item[6], "pub_date": item[7]})
 
         self.filter_results(None)
 

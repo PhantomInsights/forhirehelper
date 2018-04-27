@@ -1,10 +1,11 @@
 # r/ForHire Helper
 
-r/ForHire Helper is a free and opensource Python desktop application that helps freelancers and employers find the best candidates faster and easier.
+r/ForHire Helper is a free and open source Python desktop application that helps freelancers and employers find the best candidates faster and easier.
 
-This application uses the following APis and libraries:
 
-* wxPython 4 for the GUI framework.
+It uses the following libraries and technologies:
+
+* wxPython 4 for the GUI framework and to preview Reddit posts.
 * Requests to communicate with the Reddit JSON API.
 * SQLite to manage keywords, blacklists and bookmarks.
 
@@ -30,7 +31,7 @@ Note: macOS and Linux users must use `python3` instead of `python`.
 
 After running those commands a new window will appear with 3 tabs.
 
-The first tab contains a button that will connect to the Reddit API and will download the latest posts from [r/ForHire](https://www.reddit.com/r/forhire).
+The first tab contains a button that will connect to the Reddit API and will download the latest posts from the selected Subreddit, the default one is [r/ForHire](https://www.reddit.com/r/forhire).
 
 Those posts will be filtered between `Hiring` and `For Hire`. You can apply your custom keywords and blacklists by checking their respective boxes.
 
@@ -46,4 +47,4 @@ In the third tab you will be presented with all the posts you have bookmarked fr
 
 For your convenience a Windows 64-bit executable is available, you can download it directly from GitHub.
 
-[![Download](https://i.imgur.com/QEtsNHg.png)](https://github.com/PhantomInsights/forhirehelper/releases/download/v0.1/forhire.exe)
+[![Download](https://i.imgur.com/QEtsNHg.png)](https://github.com/PhantomInsights/forhirehelper/releases/download/v0.2/forhire.exe)

@@ -1,7 +1,7 @@
 """
 In this tab you can manage your keywords and blacklist items.
 
-The code in this tab is highly resusable since both keywords and blacklists are
+The code in this tab is highly reusable since both keywords and blacklists are
 based on the same principle.
 """
 
