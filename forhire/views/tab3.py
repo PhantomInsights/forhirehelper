@@ -16,7 +16,7 @@ from wx.adv import NotificationMessage
 
 import main
 from libs import sql_helpers
-from libs.sibreddits import SUBREDDITS_LIST
+from libs.subreddits import SUBREDDITS_LIST
 
 
 class Tab3(wx.Panel):
