@@ -12,7 +12,7 @@ It uses the following libraries and technologies:
 ## Dependencies
 
 ```
-pip install wxpython`
+pip install wxpython
 pip install requests
 ```
 
@@ -33,7 +33,7 @@ After running those commands a new window will appear with 3 tabs.
 
 The first tab contains a button that will connect to the Reddit API and will download the latest posts from the selected Subreddit, the default one is [r/ForHire](https://www.reddit.com/r/forhire).
 
-Those posts will be filtered between `Hiring` and `For Hire`. You can apply your custom keywords and blacklists by checking their respective boxes.
+Those posts will be filtered between `For Hire` and  `Hiring`, or their equivalents in each subreddit. You can apply your custom keywords and blacklists by checking their respective boxes.
 
 Adding new keywords and blacklists is done in the second tab. Where you would only require to type individual words and press the `Add` button. Selecting a previous saved item and pressing the `Delete` button will delete it from your database.
 
@@ -47,4 +47,4 @@ In the third tab you will be presented with all the posts you have bookmarked fr
 
 For your convenience a Windows 64-bit executable is available, you can download it directly from GitHub.
 
-[![Download](https://i.imgur.com/QEtsNHg.png)](https://github.com/PhantomInsights/forhirehelper/releases/download/v0.2/forhire.exe)
+[![Download](https://i.imgur.com/QEtsNHg.png)](https://github.com/PhantomInsights/forhirehelper/releases/download/v0.3/forhire.exe)

@@ -10,5 +10,5 @@ SUBREDDITS_LIST = [
     {"id": "jobbit", "name": "r/jobbit", "rules": ["For Hire", "Hiring"]},
     {"id": "jobs4bitcoins", "name": "r/Jobs4Bitcoins", "rules": ["For Hire", "Hiring"]},
     {"id": "jobs4crypto", "name": "r/Jobs4Crypto", "rules": ["LFW", "Job"]},
-    {"id": "slavelabour", "name": "r/SlaveLabour", "rules": ["Task", "Offer"]}
+    {"id": "slavelabour", "name": "r/SlaveLabour", "rules": ["Offer", "Task"]}
 ]

@@ -79,7 +79,7 @@ class Tab1(wx.Panel):
         self.posts_table = wx.ListCtrl(
             self, style=wx.LC_REPORT | wx.BORDER_SUNKEN)
         self.posts_table.InsertColumn(0, "Post ID", width=100)
-        self.posts_table.InsertColumn(1, "Published Data", width=150)
+        self.posts_table.InsertColumn(1, "Published Date", width=150)
         self.posts_table.InsertColumn(2, "Author", width=180)
         self.posts_table.InsertColumn(3, "Title", width=-1)
         self.Bind(wx.EVT_LIST_ITEM_SELECTED, self.selected_item)
@@ -147,7 +147,7 @@ class Tab1(wx.Panel):
         Applies the filters to the results.
         The way it works is a bit hacky.
 
-        Blacklist items takes precedence ofver keywords.
+        Blacklist items takes precedence over keywords.
 
         When an item checks against the blacklist it is removed
         from the main list.
@@ -196,7 +196,7 @@ class Tab1(wx.Panel):
 
     def load_posts(self, after="", counter=0, target=200):
         """
-        Loads the latest posts from r/ForHire
+        Loads the latest posts from the selected subreddit.
         By default it downloads the latest 200.
         this cnn be changed in the target default value, the max is 1000.
         """
