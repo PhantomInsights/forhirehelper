@@ -12,8 +12,7 @@ It uses the following libraries and technologies:
 ## Dependencies
 
 ```
-pip install wxpython
-pip install requests
+pip install -r requirements.txt
 ```
 
 Note: macOS and Linux users must use `pip3` instead of `pip`.
