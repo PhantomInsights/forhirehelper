@@ -232,7 +232,7 @@ class Tab3(wx.Panel):
                 break
 
     def delete_from_bookmarks(self, event):
-        """opens the default web browser with the post url."""
+        """Delete the selected post from the bookmarks table."""
 
         for item in self.posts_list:
             if self.selected_post == item["post_id"]:

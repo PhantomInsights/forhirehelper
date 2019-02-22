@@ -206,7 +206,7 @@ class Tab1(wx.Panel):
                 selected_subreddit = subreddit["id"]
                 break
 
-        headers = {"User-Agent": "r/ForHire Helper v0.2"}
+        headers = {"User-Agent": "r/ForHire Helper v0.3"}
 
         if after == "":
             url = "https://www.reddit.com/r/{}/new/.json?limit=100".format(
@@ -253,7 +253,7 @@ class Tab1(wx.Panel):
             if counter >= target:
                 pass
             else:
-                time.sleep(2.2)
+                time.sleep(1.2)
                 self.load_posts(response.json()["data"]["after"], counter)
 
     def selected_item(self, event):
@@ -287,7 +287,7 @@ class Tab1(wx.Panel):
                 break
 
     def add_to_bookmarks(self, event):
-        """opens the default web browser with the post url."""
+        """Adds the selected post to the bookmarks table."""
 
         for item in self.posts_list:
             if self.selected_post == item["post_id"]:
