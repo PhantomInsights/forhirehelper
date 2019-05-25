@@ -47,3 +47,9 @@ In the third tab you will be presented with all the posts you have bookmarked fr
 For your convenience a Windows 64-bit executable is available, you can download it directly from GitHub.
 
 [![Download](https://i.imgur.com/QEtsNHg.png)](https://github.com/PhantomInsights/forhirehelper/releases/download/v0.3/forhire.exe)
+
+## Become a Patron
+
+Feel free to support the development of free tools and software. Your donations are greatly appreciated.
+
+[![Become a Patron!](https://c5.patreon.com/external/logo/become_a_patron_button.png)](https://www.patreon.com/bePatron?u=20521425)
